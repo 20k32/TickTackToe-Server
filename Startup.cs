@@ -8,6 +8,8 @@ namespace Server
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services, ConfigurationManager manager)
         {
+            services.AddSignalR();
+
             services.AddRouting(options => options.LowercaseUrls = true);
 
             services.ConfigureAuthentication(manager)

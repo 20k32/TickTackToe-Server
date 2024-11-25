@@ -1,4 +1,6 @@
 
+using Server.Controllers;
+
 namespace Server
 {
     public class Program
@@ -14,7 +16,10 @@ namespace Server
 
             var app = builder.Build();
             startup.Configure(app, app.Environment);
+            
             app.MapControllers();
+            app.MapHub<UsersHub>("/users");
+
             app.Run();
         }
     }
