@@ -2,8 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Server.Models.Api.Result;
 using Server.Models.Auth;
+using Shared.Api.Result;
 
 namespace Server.Core.Auth;
 

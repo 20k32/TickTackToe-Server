@@ -1,12 +1,12 @@
 ﻿using MongoDB.Bson;
-using PrintMe.Server.Models.Api.ApiRequest;
 using Server.Core.Auth;
 using Server.Core.Helpers;
-using Server.Models.Api.Result;
 using Server.Models.Exceptions;
 using Server.Persistence.Entity;
 using Server.Persistence.MongoDb;
-using Shared.DTOs.UserDto;
+using Shared.Api.Request;
+using Shared.Api.Result;
+using Shared.DTOs;
 
 namespace Server.Core.Services
 {

@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
-using PrintMe.Server.Models.Api.ApiRequest;
-using Shared.DTOs.UserDto;
+using Shared.Api.Request;
+using Shared.DTOs;
 
 namespace Server.Persistence.Entity
 {

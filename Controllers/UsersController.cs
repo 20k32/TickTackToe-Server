@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Server.Core.Services;
-using Server.Models.Api.Result;
 using Server.Models.Exceptions;
 using Server.Models.Extensions;
 using Server.Persistence.Entity;
-using Shared.DTOs.UserDto;
+using Shared.Api.Result;
+using Shared.DTOs;
 
 namespace Server.Controllers
 {

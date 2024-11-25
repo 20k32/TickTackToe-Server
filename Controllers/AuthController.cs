@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PrintMe.Server.Models.Api.ApiRequest;
 using Server.Core.Services;
-using Server.Models.Api.Result;
 using Server.Models.Exceptions;
+using Shared.Api.Request;
+using Shared.Api.Result;
 
 namespace Server.Controllers
 {
