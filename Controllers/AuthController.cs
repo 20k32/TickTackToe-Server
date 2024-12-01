@@ -29,33 +29,33 @@ namespace Server.Controllers
 
             if (authRequest is null)
             {
-                result = new(null, "Missing body.",
+                result = new(null, null, "Missing body.",
                     StatusCodes.Status403Forbidden);
             }
             else if (authRequest.IsNull())
             {
-                result = new(null, "Missing parameters in body.",
+                result = new(null, null, "Missing parameters in body.",
                     StatusCodes.Status403Forbidden);
             }
             else
             {
                 try
                 {
-                    var token = await _userService.GenerateTokenAsync(authRequest);
-                    result = new(token, "Token successfully created.",
+                    var tokenResult = await _userService.GenerateTokenAsync(authRequest);
+                    result = new(tokenResult.token, tokenResult.userId, "Token successfully created.",
                         StatusCodes.Status200OK);
                 }
                 catch (NotFoundUserInDbException ex)
                 {
-                    result = new(null, ex.Message, StatusCodes.Status404NotFound);
+                    result = new(null, null, ex.Message, StatusCodes.Status404NotFound);
                 }
                 catch (IncorrectPasswordException ex)
                 {
-                    result = new(null, ex.Message, StatusCodes.Status403Forbidden);
+                    result = new(null, null, ex.Message, StatusCodes.Status403Forbidden);
                 }
                 catch (Exception ex)
                 {
-                    result = new(null, $"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
+                    result = new(null, null, $"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
                         StatusCodes.Status500InternalServerError);
                 }
             }
@@ -73,30 +73,30 @@ namespace Server.Controllers
 
             if (authRequest is null)
             {
-                result = new(null, "Missing body.",
+                result = new(null, null, "Missing body.",
                     StatusCodes.Status403Forbidden);
             }
             else if (authRequest.IsNull())
             {
-                result = new(null, "Missing parameters in body.",
+                result = new(null, null, "Missing parameters in body.",
                     StatusCodes.Status403Forbidden);
             }
             else
             {
                 try
                 {
-                    var token = await _userService.GenerateTokenForNewUserAsync(authRequest);
-                    result = new(token, "Token successfully created.",
+                    var tokenResult = await _userService.GenerateTokenForNewUserAsync(authRequest);
+                    result = new(tokenResult.token, tokenResult.userId,"Token successfully created.",
                         StatusCodes.Status200OK);
                 }
                 catch(FoundUserInDbException ex)
                 {
-                    result = new(null, ex.Message,
+                    result = new(null, null, ex.Message,
                     StatusCodes.Status401Unauthorized);
                 }
                 catch (Exception ex)
                 {
-                    result = new(null, $"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
+                    result = new(null, null, $"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
                         StatusCodes.Status500InternalServerError);
                 }
             }

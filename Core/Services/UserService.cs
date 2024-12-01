@@ -60,7 +60,7 @@ namespace Server.Core.Services
             return result;
         }
 
-        public async Task<string> GenerateTokenAsync(UserAuthRequest authRequest)
+        public async Task<(string token, string userId)> GenerateTokenAsync(UserAuthRequest authRequest)
         { 
             string tokenResult = null;
 
@@ -80,10 +80,10 @@ namespace Server.Core.Services
             var loginResult = new SuccessLoginResult(dbUser.Id, authRequest.UserName);
             tokenResult = _tokenGenerator.GetForSuccessLoginResult(loginResult);
 
-            return tokenResult;
+            return (tokenResult, dbUser.Id.ToString());
         }
 
-        public async Task<string> GenerateTokenForNewUserAsync(UserAuthRequest authRequest)
+        public async Task<(string token, string userId)> GenerateTokenForNewUserAsync(UserAuthRequest authRequest)
         {
             string tokenResult = null;
 
@@ -105,7 +105,7 @@ namespace Server.Core.Services
 
             tokenResult = _tokenGenerator.GetForSuccessLoginResult(loginResult);
 
-            return tokenResult;
+            return (tokenResult, userRaw.Id.ToString());
         }
 
     }

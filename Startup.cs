@@ -1,5 +1,7 @@
 ﻿using Server.Core;
 using Server.Core.Auth;
+using Server.Core.GamePool;
+using Server.Core.SignalR;
 
 namespace Server
 {
@@ -8,7 +10,10 @@ namespace Server
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services, ConfigurationManager manager)
         {
-            services.AddSignalR();
+            services.AddGamePool();
+
+            services.AddUserIdProvider()
+                .AddSignalR();
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
