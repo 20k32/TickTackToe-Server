@@ -40,5 +40,21 @@ namespace Server.Controllers
                 await Clients.Users(parameter.ToUserId).SendAsync("OnGameHappening", parameter);
             }
         }
+
+        public async Task ExitRequest(string toUserId)
+        {
+            if (Context.UserIdentifier is string userId)
+            {
+                await Clients.Users(toUserId).SendAsync("OnExitRequested", default(bool));
+            }
+        }
+
+        public async Task ExitRequestApproved(string toUserId)
+        {
+            if (Context.UserIdentifier is string userId)
+            {
+                await Clients.Users(toUserId).SendAsync("OnExitApproved", default(bool));
+            }
+        }
     }
 }
