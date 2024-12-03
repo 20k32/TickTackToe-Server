@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Server.Models.Auth;
-using Shared.Api.Result;
+using Shared.Api.Models;
 
 namespace Server.Core.Auth;
 

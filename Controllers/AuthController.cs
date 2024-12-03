@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Server.Core.Services;
 using Server.Models.Exceptions;
+using Server.Models.Extensions;
+using Shared.Api.Models;
 using Shared.Api.Request;
 using Shared.Api.Result;
 
@@ -21,20 +23,20 @@ namespace Server.Controllers
         /// Checks for user in database and generates token with fields: id, email, role.
         /// To view use https://jwt.io/
         /// </summary>
-        [ProducesResponseType(typeof(TokenResult), 200)]
+        [ProducesResponseType(typeof(ApiResult<TokenResult>), 200)]
         [HttpPost("login")]
-        public async Task<IResult> GenerateToken([FromBody] UserAuthRequest authRequest)
+        public async Task<IActionResult> GenerateToken([FromBody] UserAuthRequest authRequest)
         {
-            TokenResult result;
+            PlainResult result;
 
             if (authRequest is null)
             {
-                result = new(null, null, "Missing body.",
+                result = new("Missing body.",
                     StatusCodes.Status403Forbidden);
             }
             else if (authRequest.IsNull())
             {
-                result = new(null, null, "Missing parameters in body.",
+                result = new("Missing parameters in body.",
                     StatusCodes.Status403Forbidden);
             }
             else
@@ -42,43 +44,44 @@ namespace Server.Controllers
                 try
                 {
                     var tokenResult = await _userService.GenerateTokenAsync(authRequest);
-                    result = new(tokenResult.token, tokenResult.userId, "Token successfully created.",
+                    result = new ApiResult<TokenResult>(new(tokenResult.token, tokenResult.userId), "Token successfully created.",
                         StatusCodes.Status200OK);
                 }
                 catch (NotFoundUserInDbException ex)
                 {
-                    result = new(null, null, ex.Message, StatusCodes.Status404NotFound);
+                    result = new(ex.Message, StatusCodes.Status404NotFound);
                 }
                 catch (IncorrectPasswordException ex)
                 {
-                    result = new(null, null, ex.Message, StatusCodes.Status403Forbidden);
+                    result = new(ex.Message, StatusCodes.Status403Forbidden);
                 }
                 catch (Exception ex)
                 {
-                    result = new(null, null, $"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
+                    result = new($"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
                         StatusCodes.Status500InternalServerError);
                 }
             }
 
-            return Results.Json(result);
+            return result.ToObjectResult();
         }
 
         /// <summary>
         /// Create a new user and save it to the database.
         /// </summary>
         [HttpPost("register")]
-        public async Task<IResult> RegisterUser([FromBody] UserAuthRequest authRequest)
+        [ProducesResponseType(typeof(ApiResult<TokenResult>), 200)]
+        public async Task<IActionResult> RegisterUser([FromBody] UserAuthRequest authRequest)
         {
-            TokenResult result;
+            PlainResult result;
 
             if (authRequest is null)
             {
-                result = new(null, null, "Missing body.",
+                result = new("Missing body.",
                     StatusCodes.Status403Forbidden);
             }
             else if (authRequest.IsNull())
             {
-                result = new(null, null, "Missing parameters in body.",
+                result = new("Missing parameters in body.",
                     StatusCodes.Status403Forbidden);
             }
             else
@@ -86,22 +89,23 @@ namespace Server.Controllers
                 try
                 {
                     var tokenResult = await _userService.GenerateTokenForNewUserAsync(authRequest);
-                    result = new(tokenResult.token, tokenResult.userId,"Token successfully created.",
+
+                    result = new ApiResult<TokenResult>(new TokenResult(tokenResult.token, tokenResult.userId),"Token successfully created.",
                         StatusCodes.Status200OK);
                 }
                 catch(FoundUserInDbException ex)
                 {
-                    result = new(null, null, ex.Message,
+                    result = new(ex.Message,
                     StatusCodes.Status401Unauthorized);
                 }
                 catch (Exception ex)
                 {
-                    result = new(null, null, $"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
+                    result = new($"Internal server error while generating token for user.\n{ex.Message}\n{ex.StackTrace}",
                         StatusCodes.Status500InternalServerError);
                 }
             }
 
-            return Results.Json(result);
+            return result.ToObjectResult();
         }
 
     }

@@ -2,6 +2,7 @@
 using Server.Core.Auth;
 using Server.Core.GamePool;
 using Server.Core.SignalR;
+using Newtonsoft.Json;
 
 namespace Server
 {
@@ -23,6 +24,11 @@ namespace Server
 
             services.RegisterCoreServices()
                 .RegiseterDatabaseServices(manager);
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+            });
         }
 
         public void Configure(IApplicationBuilder builder, IWebHostEnvironment environment)

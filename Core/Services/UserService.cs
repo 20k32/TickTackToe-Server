@@ -4,6 +4,7 @@ using Server.Core.Helpers;
 using Server.Models.Exceptions;
 using Server.Persistence.Entity;
 using Server.Persistence.MongoDb;
+using Shared.Api.Models;
 using Shared.Api.Request;
 using Shared.Api.Result;
 using Shared.DTOs;

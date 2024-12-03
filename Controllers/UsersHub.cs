@@ -28,6 +28,11 @@ namespace Server.Controllers
             }
         }
 
+        public void RemoveFromPoolAsync(string userId)
+        {
+            
+        }
+
         public Task AddToPoolAsync(string userName, string userId)
         {
             return _gamePool.AddUserAsync(userName, userId);

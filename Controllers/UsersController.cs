@@ -24,31 +24,31 @@ namespace Server.Controllers
         /// <summary>
         /// Updates user fields except password because it requires additional logic.
         /// </summary>
-        [ProducesResponseType(typeof(UserResult), 200)]
+        [ProducesResponseType(typeof(ApiResult<UserDto>), 200)]
         [HttpPut("my")]
         [Authorize]
-        public async Task<IResult> UpdateUserById([FromBody] UserDto user)
+        public async Task<IActionResult> UpdateUserById([FromBody] UserDto user)
         {
-            UserResult result;
+            PlainResult result;
             var id = Request.TryGetUserId();
             ObjectId userId;
 
             if (id is null)
             {
-                result = new UserResult(null, "Missing id.", StatusCodes.Status400BadRequest);
+                result = new ("Missing id.", StatusCodes.Status400BadRequest);
             }
             if (!ObjectId.TryParse(id, out userId))
             {
-                result = new(null, "Unable get id from jwt.",
+                result = new ("Unable get id from jwt.",
                     StatusCodes.Status401Unauthorized);
             }
             if (user is null)
             {
-                result = new UserResult(null, "Missing body.", StatusCodes.Status400BadRequest);
+                result = new ("Missing body.", StatusCodes.Status400BadRequest);
             }
             else if (user.IsNull())
             {
-                result = new UserResult(null, "Missing parameters in body.", StatusCodes.Status400BadRequest);
+                result = new ("Missing parameters in body.", StatusCodes.Status400BadRequest);
             }
             else
             {
@@ -56,21 +56,21 @@ namespace Server.Controllers
                 {
                     var userResult = await _userService.UpdateUser(userId, user);
 
-                    result = new(userResult, "There is such user in database.",
+                    result = new ApiResult<UserDto>(userResult, "There is such user in database.",
                         StatusCodes.Status200OK);
                 }
                 catch (NotFoundUserInDbException ex)
                 {
-                    result = new(null, ex.Message, StatusCodes.Status403Forbidden);
+                    result = new(ex.Message, StatusCodes.Status403Forbidden);
                 }
                 catch (Exception ex)
                 {
-                    result = new(null, $"Internal server error while updating user.\n{ex.Message}\n{ex.StackTrace}",
+                    result = new($"Internal server error while updating user.\n{ex.Message}\n{ex.StackTrace}",
                         StatusCodes.Status500InternalServerError);
                 }
             }
 
-            return Results.Json(result);
+            return result.ToObjectResult();
         }
 
         /// <summary>
@@ -78,22 +78,22 @@ namespace Server.Controllers
         /// </summary>
         [Authorize]
         [HttpGet("my")]
-        [ProducesResponseType(typeof(UserResult), 200)]
-        public async Task<IResult> GetUserFromJwt()
+        [ProducesResponseType(typeof(ApiResult<UserDto>), 200)]
+        public async Task<IActionResult> GetUserFromJwt()
         {
             ObjectId userId;
 
-            UserResult result;
+            PlainResult result;
             var id = Request.TryGetUserId();
 
             if (id is null)
             {
-                result = new(null, "Missing id.",
+                result = new("Missing id.",
                     StatusCodes.Status401Unauthorized);
             }
             else if (!ObjectId.TryParse(id, out userId))
             {
-                result = new(null, "Unable get id from jwt.",
+                result = new("Unable get id from jwt.",
                     StatusCodes.Status401Unauthorized);
             }
             else
@@ -104,22 +104,22 @@ namespace Server.Controllers
 
                     var userDto = await _userService.GetUserByIdAsync(objectId);
 
-                    result = new(userDto, "There is such user in database",
+                    result = new ApiResult<UserDto>(userDto, "There is such user in database",
                         StatusCodes.Status200OK);
                 }
                 catch (NotFoundUserInDbException ex)
                 {
-                    result = new(null, ex.Message,
+                    result = new(ex.Message,
                         StatusCodes.Status404NotFound);
                 }
                 catch (Exception ex)
                 {
-                    result = new(null, $"Internal server error while getting user\n{ex.Message}\n{ex.StackTrace}",
+                    result = new($"Internal server error while getting user\n{ex.Message}\n{ex.StackTrace}",
                         StatusCodes.Status500InternalServerError);
                 }
             }
 
-            return Results.Json(result);
+            return result.ToObjectResult();
         }
     }
 }
