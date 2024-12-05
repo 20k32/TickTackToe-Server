@@ -33,7 +33,8 @@ namespace Server.Persistence.MongoDb
             var filter = Builders<User>.Filter.Eq(existing => existing.Id, id);
 
             var updateDefinition = Builders<User>.Update
-                .Set(existing => existing.Rating, user.Rating);
+                .Set(existing => existing.Rating, user.Rating)
+                .Set(existing => existing.GameHistory, user.GameHistory);
 
             return await Users.FindOneAndUpdateAsync(filter, updateDefinition);
         }

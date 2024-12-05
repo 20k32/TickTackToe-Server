@@ -3,9 +3,8 @@
     internal sealed class GamePoolItem
     {
         public string UserId { get; init; }
-        public string UserName { get; init; }
 
-        public GamePoolItem(string userId, string userName) => (UserId, UserName) = (userId, userName);
+        public GamePoolItem(string userId) => (UserId) = (userId);
 
         public override bool Equals(object obj)
         {

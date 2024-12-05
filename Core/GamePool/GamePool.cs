@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Server.Controllers;
+using Server.Core.Services;
 using Server.Persistence.MongoDb;
 using Shared.Api.Messages;
 using System.Collections.Concurrent;
@@ -9,8 +10,7 @@ namespace Server.Core.GamePool
 {
     internal class GamePool
     {
-        //private static BlockingCollection<GamePoolItem> _collection;
-
+        private readonly UserService _userService;
         private readonly IServiceProvider _provider;
         private readonly IHubContext<UsersHub> _users;
 
@@ -25,15 +25,15 @@ namespace Server.Core.GamePool
         {
             _provider = provider;
             _users = _provider.GetService<IHubContext<UsersHub>>();
+            _userService = _provider.GetService<UserService>();
         }
 
         public bool RemoveUser(string userId) => _collection.TryRemove(userId, out _);
 
-        public async Task AddUserAsync(string userName, string userId)
+        public async Task AddUserAsync(string userId)
         {
-            Debug.WriteLine($"{userId}: {userName}");
 
-            var gamePoolItem = new GamePoolItem(userId, userName);
+            var gamePoolItem = new GamePoolItem(userId);
 
             _collection.TryAdd(gamePoolItem.UserId, gamePoolItem);
 
@@ -57,15 +57,18 @@ namespace Server.Core.GamePool
                             (first, second) = (second, first);
                         }
 
-                        var gameParameters = new GameStartParameters(first.UserId, second.UserId, first.UserName, second.UserName);
+                        var firstUserRaw = await _userService.GetUserByIdAsync(new(first.UserId));
+                        var secondUserRaw = await _userService.GetUserByIdAsync(new(second.UserId));
 
-                        gameParameters.SenderUserName = second.UserName;
+                        var gameParameters = new GameStartParameters(first.UserId, second.UserId, firstUserRaw.UserName, secondUserRaw.UserName);
+
+                        gameParameters.SenderUserName = secondUserRaw.UserName;
                         gameParameters.SenderId = second.UserId;
 
                         await _users.Clients.Users(first.UserId)
                             .SendAsync("OnStartMessage", gameParameters);
 
-                        gameParameters.SenderUserName = first.UserName;
+                        gameParameters.SenderUserName = firstUserRaw.UserName;
                         gameParameters.SenderId = first.UserId;
 
 

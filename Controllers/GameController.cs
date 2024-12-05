@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Core.GamePool;
+using Server.Core.Services;
 using Server.Models.Extensions;
 using Shared.Api.Models;
 using Shared.Api.Result;
@@ -12,10 +13,12 @@ namespace Server.Controllers
     public class GameController : ControllerBase
     {
         private GamePool _gamePool;
+        private UserService _userService;
 
         public GameController(IServiceProvider provider)
         {
             _gamePool = provider.GetService<GamePool>();
+            _userService = provider.GetService<UserService>();
         }
 
         [HttpGet("pool")]
@@ -23,12 +26,14 @@ namespace Server.Controllers
         {
             await foreach(var item in _gamePool.GetAsyncEnumerable())
             {
-                yield return new(item.UserName);
+                var user = await _userService.GetUserByIdAsync(new(item.UserId));
+
+                yield return new(user.UserName, user.Rating);
             }
         }
 
-        [HttpPut("pool/{userName}")]
-        public async Task<IActionResult> AddMeToPool(string userName)
+        [HttpPut("pool")]
+        public async Task<IActionResult> AddMeToPool()
         {
             PlainResult result;
 
@@ -41,7 +46,7 @@ namespace Server.Controllers
 
             try
             {
-                await _gamePool.AddUserAsync(userName, id);
+                await _gamePool.AddUserAsync(id);
                 result = new ("Successfully added you to pool", StatusCodes.Status200OK);
             }
             catch (Exception ex)

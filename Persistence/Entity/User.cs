@@ -10,6 +10,7 @@ namespace Server.Persistence.Entity
         public string UserName { get; set; }
         public string Password { get; set; }
         public string PasswordSalt { get; set; }
-        public int Rating { get; set; }
+        public double Rating { get; set; }
+        public ICollection<GameHistory> GameHistory { get; set; }
     }
 }

@@ -33,9 +33,9 @@ namespace Server.Controllers
             
         }
 
-        public Task AddToPoolAsync(string userName, string userId)
+        public Task AddToPoolAsync(string userId)
         {
-            return _gamePool.AddUserAsync(userName, userId);
+            return _gamePool.AddUserAsync(userId);
         }
 
         public async Task GameHappening(GameChangedParameter parameter)
